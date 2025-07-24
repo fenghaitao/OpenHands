@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(source:*)",
+      "Bash(uv pip install:*)",
+      "Bash(litellm:*)",
+      "Bash(curl:*)",
+      "Bash(lsof:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(rm:*)",
+      "Bash(kill:*)",
+      "Bash(-H \"Content-Type: application/json\" )",
+      "Bash(-H \"Authorization: Bearer sk-openhands-litellm-key\" )",
+      "Bash(-d '{\n    \"\"model\"\": \"\"openhands-copilot\"\",\n    \"\"messages\"\": [{\"\"role\"\": \"\"user\"\", \"\"content\"\": \"\"Hello, can you hear me?\"\"}],\n    \"\"max_tokens\"\": 50\n  }')",
+      "Bash(sudo:*)",
+      "Bash(psql:*)",
+      "Bash(pip install:*)",
+      "Bash(find:*)"
+    ],
+    "deny": []
+  }
+}

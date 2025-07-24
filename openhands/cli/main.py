@@ -13,6 +13,7 @@ from openhands.cli.commands import (
     check_folder_security_agreement,
     handle_commands,
 )
+from openhands.cli.auth import auth
 from openhands.cli.settings import modify_llm_settings_basic
 from openhands.cli.shell_config import (
     ShellConfigManager,
@@ -494,6 +495,29 @@ def run_alias_setup_flow(config: OpenHandsConfig) -> None:
 async def main_with_loop(loop: asyncio.AbstractEventLoop) -> None:
     """Runs the agent in CLI mode."""
     args = parse_arguments()
+    
+    # Handle auth commands
+    if hasattr(args, 'command') and args.command == 'auth':
+        if args.auth_command == 'github-copilot':
+            from openhands.cli.auth import github_copilot
+            # Create a mock context for the click command
+            import click
+            ctx = click.Context(github_copilot)
+            ctx.params = {
+                'timeout': args.timeout,
+                'token_dir': getattr(args, 'token_dir', None),
+                'check_only': getattr(args, 'check_only', False),
+                'revoke': getattr(args, 'revoke', False),
+                'status': getattr(args, 'status', False),
+            }
+            try:
+                github_copilot.invoke(ctx)
+            except SystemExit:
+                pass
+            return
+        else:
+            print("Unknown auth command. Use 'openhands auth --help' for available options.")
+            return
 
     # Set log level from command line argument if provided
     if args.log_level and isinstance(args.log_level, str):

@@ -1,0 +1,162 @@
+---
+title: GitHub Copilot
+description: OpenHands supports GitHub Copilot models through LiteLLM integration.
+---
+
+# GitHub Copilot
+
+OpenHands supports GitHub Copilot models through our LiteLLM integration. GitHub Copilot provides access to advanced language models with enhanced coding capabilities.
+
+## Supported Models
+
+GitHub Copilot supports the following models:
+- `github_copilot/gpt-4.1` - Latest GPT-4 model optimized for coding
+- `github_copilot/gpt-4o` - GPT-4 Omni model
+- `github_copilot/gpt-4o-mini` - Lightweight GPT-4 Omni model
+- `github_copilot/o1-preview` - OpenAI o1 preview model
+- `github_copilot/o1-mini` - OpenAI o1 mini model
+- `github_copilot/claude-sonnet-4` - Claude Sonnet 4 model
+
+## Authentication
+
+To use GitHub Copilot, you need a valid GitHub Copilot subscription and authentication token.
+
+### Environment Variable
+
+Set your GitHub token as an environment variable:
+
+```bash
+export GITHUB_TOKEN="your_github_token_here"
+```
+
+### Configuration File
+
+Add your GitHub token to your `config.toml`:
+
+```toml
+[llm]
+model = "github_copilot/gpt-4.1"
+api_key = "your_github_token_here"
+custom_llm_provider = "github_copilot"
+```
+
+## Configuration Options
+
+GitHub Copilot supports all standard LLM configuration options:
+
+```toml
+[llm]
+model = "github_copilot/gpt-4.1"
+api_key = "your_github_token_here"
+custom_llm_provider = "github_copilot"
+temperature = 0.0
+max_output_tokens = 4096
+timeout = 60
+```
+
+## Usage Examples
+
+### CLI Usage
+
+```bash
+# Using environment variable
+export GITHUB_TOKEN="your_token"
+openhands --model github_copilot/gpt-4.1
+
+# Using inline configuration
+openhands --model github_copilot/gpt-4.1 --api-key your_token
+```
+
+### Python API Usage
+
+```python
+from openhands.core.config import LLMConfig
+from openhands.llm import LLM
+
+# Configure GitHub Copilot
+config = LLMConfig(
+    model="github_copilot/gpt-4.1",
+    api_key="your_github_token",
+    custom_llm_provider="github_copilot"
+)
+
+# Create LLM instance
+llm = LLM(config)
+
+# Use the LLM
+response = llm.completion(
+    messages=[{"role": "user", "content": "Write a Python function to sort a list"}]
+)
+```
+
+## Features
+
+GitHub Copilot models support:
+- ✅ Function calling
+- ✅ Vision capabilities (model dependent)
+- ✅ Streaming responses
+- ✅ Custom temperature and token limits
+- ✅ Prompt caching (model dependent)
+
+## Troubleshooting
+
+### Authentication Issues
+
+If you encounter authentication errors:
+
+1. Verify your GitHub Copilot subscription is active
+2. Ensure your GitHub token has the necessary permissions
+3. Check that the token is correctly set in environment variables or config
+
+### Model Availability
+
+If a model is not available:
+
+1. Check that the model name is correctly formatted with the `github_copilot/` prefix
+2. Verify the model is supported by your GitHub Copilot subscription
+3. Try using a different supported model
+
+### Rate Limiting
+
+GitHub Copilot has rate limits. If you encounter rate limit errors:
+
+1. Implement retry logic with exponential backoff
+2. Consider using a different model with higher limits
+3. Monitor your usage through GitHub's dashboard
+
+## Advanced Configuration
+
+### Custom Headers
+
+You can customize the headers sent to GitHub Copilot:
+
+```python
+from openhands.llm.github_copilot import GitHubCopilotConfig
+
+# Get default LiteLLM parameters
+params = GitHubCopilotConfig.get_litellm_params(config)
+
+# Customize headers
+params["extra_headers"]["Custom-Header"] = "custom-value"
+```
+
+### Model Validation
+
+Validate your GitHub Copilot configuration:
+
+```python
+from openhands.llm.github_copilot import validate_github_copilot_config
+
+is_valid = validate_github_copilot_config(config)
+if not is_valid:
+    print("Invalid GitHub Copilot configuration")
+```
+
+## Cost Considerations
+
+GitHub Copilot usage is typically included in your subscription, but be aware of:
+- Rate limits and quotas
+- Model-specific pricing (if applicable)
+- Usage monitoring through GitHub's dashboard
+
+For the most up-to-date information on GitHub Copilot models and pricing, visit the [GitHub Copilot documentation](https://docs.github.com/en/copilot).

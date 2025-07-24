@@ -1,0 +1,16 @@
+model_list:
+  - model_name: github_copilot/gpt-4.1
+    litellm_params:
+      model: github_copilot/gpt-4.1
+      api_base: https://api.githubcopilot.com
+      api_key: sk-1234
+      extra_headers:
+        Editor-Version: "vscode/1.85.0"
+        Editor-Plugin-Version: "copilot-chat/0.11.1"
+        User-Agent: "GitHubCopilot/1.0"
+        Copilot-Integration-Id: "vscode-copilot"
+
+litellm_settings:
+  drop_params: true
+  modify_params: true
+  cache: false

@@ -765,6 +765,22 @@ def get_parser() -> argparse.ArgumentParser:
         type=str,
         default=None,
     )
+    
+    # Add auth subcommand
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+    
+    # Auth command
+    auth_parser = subparsers.add_parser('auth', help='Authentication commands')
+    auth_subparsers = auth_parser.add_subparsers(dest='auth_command', help='Authentication providers')
+    
+    # GitHub Copilot auth
+    github_copilot_parser = auth_subparsers.add_parser('github-copilot', help='GitHub Copilot authentication')
+    github_copilot_parser.add_argument('--timeout', type=int, default=900, help='Authentication timeout in seconds')
+    github_copilot_parser.add_argument('--token-dir', type=str, help='Directory to store tokens')
+    github_copilot_parser.add_argument('--check-only', action='store_true', help='Only check authentication status')
+    github_copilot_parser.add_argument('--revoke', action='store_true', help='Revoke authentication')
+    github_copilot_parser.add_argument('--status', action='store_true', help='Show detailed status')
+    
     return parser
 
 

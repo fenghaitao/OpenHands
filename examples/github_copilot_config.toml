@@ -1,0 +1,58 @@
+# Example configuration for GitHub Copilot integration with OpenHands
+# Copy this file to config.toml and modify as needed
+
+[core]
+workspace_base = "./workspace"
+debug = false
+
+[llm]
+# GitHub Copilot model configuration
+model = "github_copilot/gpt-4.1"
+
+# Authentication - use either api_key here or set GITHUB_TOKEN environment variable
+# api_key = "your_github_token_here"
+
+# Required for GitHub Copilot
+custom_llm_provider = "github_copilot"
+
+# Optional: Override default API base URL (usually not needed)
+# base_url = "https://api.githubcopilot.com"
+
+# Standard LLM configuration options
+temperature = 0.0
+max_output_tokens = 4096
+timeout = 60
+num_retries = 3
+
+# Enable function calling (supported by GitHub Copilot models)
+# native_tool_calling = true
+
+# Optional: Enable prompt caching if supported
+# caching_prompt = true
+
+# Optional: Disable vision capabilities if not needed
+# disable_vision = false
+
+[agent]
+# Agent configuration
+name = "CodeActAgent"
+
+[runtime]
+# Runtime configuration
+name = "docker"
+
+# Example alternative models you can use:
+# [llm.gpt4o]
+# model = "github_copilot/gpt-4o"
+# custom_llm_provider = "github_copilot"
+# temperature = 0.1
+
+# [llm.o1_preview]
+# model = "github_copilot/o1-preview"
+# custom_llm_provider = "github_copilot"
+# reasoning_effort = "high"
+
+# [llm.claude_sonnet]
+# model = "github_copilot/claude-sonnet-4"
+# custom_llm_provider = "github_copilot"
+# temperature = 0.0

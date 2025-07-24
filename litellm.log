@@ -1,0 +1,30 @@
+Traceback (most recent call last):
+  File "/home/hfeng1/Sources/OpenHands/.venv/lib/python3.12/site-packages/litellm/proxy/proxy_server.py", line 74, in <module>
+    import backoff
+ModuleNotFoundError: No module named 'backoff'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/hfeng1/Sources/OpenHands/.venv/bin/litellm", line 10, in <module>
+    sys.exit(run_server())
+             ^^^^^^^^^^^^
+  File "/home/hfeng1/Sources/OpenHands/.venv/lib/python3.12/site-packages/click/core.py", line 1442, in __call__
+    return self.main(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hfeng1/Sources/OpenHands/.venv/lib/python3.12/site-packages/click/core.py", line 1363, in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+  File "/home/hfeng1/Sources/OpenHands/.venv/lib/python3.12/site-packages/click/core.py", line 1226, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hfeng1/Sources/OpenHands/.venv/lib/python3.12/site-packages/click/core.py", line 794, in invoke
+    return callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hfeng1/Sources/OpenHands/.venv/lib/python3.12/site-packages/litellm/proxy/proxy_cli.py", line 549, in run_server
+    raise e
+  File "/home/hfeng1/Sources/OpenHands/.venv/lib/python3.12/site-packages/litellm/proxy/proxy_cli.py", line 536, in run_server
+    from .proxy_server import (
+  File "/home/hfeng1/Sources/OpenHands/.venv/lib/python3.12/site-packages/litellm/proxy/proxy_server.py", line 80, in <module>
+    raise ImportError(f"Missing dependency {e}. Run `pip install 'litellm[proxy]'`")
+ImportError: Missing dependency No module named 'backoff'. Run `pip install 'litellm[proxy]'`

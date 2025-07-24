@@ -1,0 +1,274 @@
+###################### OpenHands Configuration for GitHub Copilot ######################
+#
+# This configuration file is optimized for GitHub Copilot usage with OpenHands.
+# It includes all necessary settings for GitHub Copilot OAuth authentication.
+#
+##########################################################################################
+
+#################################### Core ####################################
+# General core configurations
+##############################################################################
+[core]
+# API keys and configuration for core services
+
+# Base path for the workspace
+workspace_base = "./"
+
+# Cache directory path
+cache_dir = "/tmp/cache"
+
+# Debugging enabled
+debug = false
+
+# Disable color in terminal output
+disable_color = false
+
+# Path to store trajectories, can be a folder or a file
+# If it's a folder, the session id will be used as the file name
+#save_trajectory_path="./trajectories"
+
+# Whether to save screenshots in the trajectory
+# The screenshots are encoded and can make trajectory json files very large
+save_screenshots_in_trajectory = false
+
+# Path to replay a trajectory, must be a file path
+# If provided, trajectory will be loaded and replayed before the
+# agent responds to any user instruction
+#replay_trajectory_path = ""
+
+# File store path
+file_store_path = "/tmp/file_store"
+
+# Persist sandbox after the agent finishes
+# persist_sandbox = true
+
+# Run as a devin instance
+# run_as_devin = false
+
+# Disable the security scanner
+# disable_security_scanner = false
+
+#################################### LLM ####################################
+# Configuration for the Language Model
+##############################################################################
+[llm]
+# GitHub Copilot model configuration
+model = "github_copilot/gpt-4.1"
+
+# GitHub Copilot requires this custom provider setting
+custom_llm_provider = "github_copilot"
+
+# API key - Leave empty to use OAuth authentication
+# If you have a GitHub token, you can set it here, but OAuth is recommended
+# api_key = "your_github_token_here"
+
+# Base URL for GitHub Copilot API (automatically set)
+# base_url = "https://api.githubcopilot.com"
+
+# API version (not needed for GitHub Copilot)
+# api_version = ""
+
+# AWS credentials (not needed for GitHub Copilot)
+# aws_access_key_id = ""
+# aws_secret_access_key = ""
+# aws_region_name = ""
+
+# Cost tracking (GitHub Copilot usage is typically included in subscription)
+input_cost_per_token = 0.0
+output_cost_per_token = 0.0
+
+# Maximum number of characters in an observation's content
+max_message_chars = 30000
+
+# Maximum number of input tokens
+max_input_tokens = 0
+
+# Maximum number of output tokens
+max_output_tokens = 4096
+
+# Number of retries to attempt when an operation fails with the LLM
+num_retries = 4
+
+# Multiplier for the exponential backoff
+retry_multiplier = 2
+
+# Minimum time to wait between retries, in seconds
+retry_min_wait = 5
+
+# Maximum time to wait between retries, in seconds
+retry_max_wait = 30
+
+# Temperature for the LLM (0.0 = deterministic, 1.0 = creative)
+temperature = 0.0
+
+# Timeout for the LLM in seconds
+timeout = 60
+
+# Top-k sampling parameter
+# top_k = 50
+
+# Top-p sampling parameter
+top_p = 1.0
+
+# Enable prompt caching if supported by the model
+caching_prompt = true
+
+# Enable native tool calling (GitHub Copilot models support this)
+native_tool_calling = true
+
+# Disable vision capabilities if not needed (saves costs)
+disable_vision = false
+
+# Drop unsupported parameters without causing errors
+drop_params = true
+
+# Allow LiteLLM to modify parameters for compatibility
+modify_params = true
+
+# Log completions for debugging (set to true if needed)
+log_completions = false
+
+# Folder to log completions to (if log_completions is true)
+log_completions_folder = "./logs/completions"
+
+# Custom tokenizer (not needed for GitHub Copilot)
+# custom_tokenizer = ""
+
+# Reasoning effort for o1 models (low, medium, high)
+reasoning_effort = "high"
+
+# Seed for reproducible outputs
+# seed = 42
+
+# Safety settings for models that support them (e.g., Mistral AI, Gemini)
+# safety_settings = []
+
+#################################### Agent ###################################
+# Configuration for the agent
+##############################################################################
+[agent]
+# Name of the agent to use
+# name = "CodeActAgent"
+
+# Memory enabled
+# memory_enabled = true
+
+# Memory maximum threads
+# memory_max_threads = 3
+
+#################################### Runtime #################################
+# Configuration for the runtime/sandbox
+##############################################################################
+[runtime]
+# Type of runtime to use
+name = "docker"
+
+# Base container image to use
+# base_container_image = "ghcr.io/all-hands-ai/runtime:0.14-nikolaik"
+
+# Whether to use a local container
+# local_runtime = true
+
+# Timeout for the runtime in seconds
+# timeout = 120
+
+# API key for the runtime (if using remote)
+# api_key = ""
+
+# Remote runtime API URL (if using remote)
+# remote_runtime_api_url = ""
+
+# Keep runtime alive after agent finishes
+# keep_runtime_alive = false
+
+# Runtime startup probe timeout
+# runtime_startup_probe_timeout = 240
+
+# Runtime startup probe ports
+# runtime_startup_probe_ports = [3000, 3001]
+
+# Configure volumes under the [runtime] section:
+# [runtime.volumes]
+# host_path = "container_path"
+
+#################################### Security ################################
+# Configuration for security
+##############################################################################
+[security]
+# Security analyzer to use
+security_analyzer = ""
+
+# Confirmation mode for security
+confirmation_mode = false
+
+#################################### UI ######################################
+# Configuration for the UI
+##############################################################################
+[ui]
+# Default agent for the UI
+default_agent = "CodeActAgent"
+
+#################################### File Manager ############################
+# Configuration for file operations
+##############################################################################
+[file_manager]
+# File store for the file manager
+file_store = "local"
+
+#################################### Alternative GitHub Copilot Models ######
+# Uncomment and modify these sections to use different GitHub Copilot models
+##############################################################################
+
+# GPT-4.1 (Latest coding-optimized model)
+# [llm.gpt41]
+# model = "github_copilot/gpt-4.1"
+# custom_llm_provider = "github_copilot"
+# temperature = 0.0
+# max_output_tokens = 4096
+
+# GPT-4o (Omni model)
+# [llm.gpt4o]
+# model = "github_copilot/gpt-4o"
+# custom_llm_provider = "github_copilot"
+# temperature = 0.1
+# max_output_tokens = 4096
+
+# GPT-4o Mini (Lightweight model)
+# [llm.gpt4o_mini]
+# model = "github_copilot/gpt-4o-mini"
+# custom_llm_provider = "github_copilot"
+# temperature = 0.0
+# max_output_tokens = 2048
+
+# o1 Preview (Reasoning model)
+# [llm.o1_preview]
+# model = "github_copilot/o1-preview"
+# custom_llm_provider = "github_copilot"
+# reasoning_effort = "high"
+# max_output_tokens = 32768
+
+# o1 Mini (Lightweight reasoning model)
+# [llm.o1_mini]
+# model = "github_copilot/o1-mini"
+# custom_llm_provider = "github_copilot"
+# reasoning_effort = "medium"
+# max_output_tokens = 65536
+
+#################################### Usage Instructions ######################
+#
+# 1. Authenticate with GitHub Copilot:
+#    openhands auth github-copilot
+#
+# 2. Start OpenHands with this configuration:
+#    openhands --config-file config_github_copilot.toml
+#
+# 3. Or use a specific model:
+#    openhands --config-file config_github_copilot.toml --model github_copilot/gpt-4.1
+#
+# 4. Check authentication status:
+#    openhands auth github-copilot --status
+#
+# 5. Validate the setup:
+#    python validate_github_copilot.py
+#
+##############################################################################

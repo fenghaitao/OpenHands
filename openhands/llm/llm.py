@@ -33,6 +33,7 @@ from openhands.llm.fn_call_converter import (
     convert_fncall_messages_to_non_fncall_messages,
     convert_non_fncall_messages_to_fncall_messages,
 )
+from openhands.llm.github_copilot import GitHubCopilotConfig, validate_github_copilot_config
 from openhands.llm.metrics import Metrics
 from openhands.llm.retry_mixin import RetryMixin
 
@@ -86,6 +87,12 @@ FUNCTION_CALLING_SUPPORTED_MODELS = [
     'o4-mini-2025-04-16',
     'gemini-2.5-pro',
     'gpt-4.1',
+    'github_copilot/gpt-4.1',
+    'github_copilot/gpt-4o',
+    'github_copilot/gpt-4o-mini',
+    'github_copilot/o1-preview',
+    'github_copilot/o1-mini',
+    'github_copilot/claude-sonnet-4',
     'kimi-k2-0711-preview',
 ]
 
@@ -138,6 +145,16 @@ class LLM(RetryMixin, DebugMixin):
         )
         self.cost_metric_supported: bool = True
         self.config: LLMConfig = copy.deepcopy(config)
+
+        # Configure GitHub Copilot if needed
+        if GitHubCopilotConfig.is_github_copilot_model(self.config.model):
+            self.config = GitHubCopilotConfig.configure_for_copilot(self.config)
+            if not validate_github_copilot_config(self.config):
+                raise ValueError(
+                    "Invalid GitHub Copilot configuration. "
+                    "Run 'openhands auth github-copilot' to authenticate or "
+                    "set GITHUB_TOKEN environment variable."
+                )
 
         self.model_info: ModelInfo | None = None
         self.retry_listener = retry_listener
@@ -208,6 +225,14 @@ class LLM(RetryMixin, DebugMixin):
         elif 'gemini' in self.config.model.lower() and self.config.safety_settings:
             kwargs['safety_settings'] = self.config.safety_settings
 
+        # For GitHub Copilot, add the required headers
+        completion_kwargs = kwargs.copy()
+        if GitHubCopilotConfig.is_github_copilot_model(self.config.model):
+            # Add GitHub Copilot specific headers
+            copilot_params = GitHubCopilotConfig.get_litellm_params(self.config)
+            if "extra_headers" in copilot_params:
+                completion_kwargs["extra_headers"] = copilot_params["extra_headers"]
+
         self._completion = partial(
             litellm_completion,
             model=self.config.model,
@@ -220,7 +245,7 @@ class LLM(RetryMixin, DebugMixin):
             timeout=self.config.timeout,
             drop_params=self.config.drop_params,
             seed=self.config.seed,
-            **kwargs,
+            **completion_kwargs,
         )
 
         self._completion_unwrapped = self._completion
