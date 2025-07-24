@@ -12,7 +12,7 @@
 # API keys and configuration for core services
 
 # Base path for the workspace
-workspace_base = "./"
+#workspace_base = "./workspace"
 
 # Cache directory path
 cache_dir = "/tmp/cache"
@@ -37,7 +37,7 @@ save_screenshots_in_trajectory = false
 #replay_trajectory_path = ""
 
 # File store path
-file_store_path = "/tmp/file_store"
+file_store_path = "~/.openhands/github_copilot_llm_direct"
 
 # Persist sandbox after the agent finishes
 # persist_sandbox = true
