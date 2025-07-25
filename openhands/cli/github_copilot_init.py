@@ -31,11 +31,17 @@ from openhands.cli.github_copilot_setup import (
     help='Force overwrite existing settings.json'
 )
 @click.option(
+    '--config-file',
+    type=click.Path(exists=True),
+    default='config.toml',
+    help='Custom config.toml file path (default: config.toml)'
+)
+@click.option(
     '--dry-run',
     is_flag=True,
     help='Show what would be done without making changes'
 )
-def github_copilot_init(mode: str, file_store_path: str, force: bool, dry_run: bool):
+def github_copilot_init(mode: str, file_store_path: str, config_file: str, force: bool, dry_run: bool):
     """Initialize GitHub Copilot settings for OpenHands.
     
     This command detects GitHub Copilot configuration and creates a settings.json
@@ -46,7 +52,7 @@ def github_copilot_init(mode: str, file_store_path: str, force: bool, dry_run: b
     
     try:
         # Detect GitHub Copilot configuration
-        copilot_config = detect_github_copilot_config()
+        copilot_config = detect_github_copilot_config(config_file)
         if not copilot_config:
             click.echo("❌ No GitHub Copilot configuration detected")
             click.echo("\nPlease ensure you have:")
@@ -58,7 +64,7 @@ def github_copilot_init(mode: str, file_store_path: str, force: bool, dry_run: b
         
         # Determine mode
         if mode == 'auto':
-            detected_mode = detect_github_copilot_mode()
+            detected_mode = detect_github_copilot_mode(config_file)
             if detected_mode:
                 mode = detected_mode
                 click.echo(f"🔍 Auto-detected mode: {mode}")
@@ -69,7 +75,7 @@ def github_copilot_init(mode: str, file_store_path: str, force: bool, dry_run: b
             click.echo(f"🔧 Using specified mode: {mode}")
         
         # Get file store path
-        config = load_openhands_config()
+        config = load_openhands_config(config_file=config_file)
         if not file_store_path:
             file_store_path = config.file_store_path
         
@@ -102,7 +108,7 @@ def github_copilot_init(mode: str, file_store_path: str, force: bool, dry_run: b
         
         # Setup settings
         async def setup():
-            return await setup_github_copilot_settings(str(file_store_path), mode)
+            return await setup_github_copilot_settings(str(file_store_path), mode, config_file)
         
         success = asyncio.run(setup())
         

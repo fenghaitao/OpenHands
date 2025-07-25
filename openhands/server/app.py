@@ -29,6 +29,7 @@ from openhands.server.routes.security import app as security_api_router
 from openhands.server.routes.settings import app as settings_router
 from openhands.server.routes.trajectory import app as trajectory_router
 from openhands.server.shared import conversation_manager
+from openhands.server.github_copilot_startup import auto_setup_github_copilot_on_startup
 
 mcp_app = mcp_server.http_app(path='/mcp')
 
@@ -47,6 +48,13 @@ def combine_lifespans(*lifespans):
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
+    # Auto-setup GitHub Copilot settings on server startup
+    try:
+        await auto_setup_github_copilot_on_startup()
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Failed to auto-setup GitHub Copilot settings: {e}")
+    
     async with conversation_manager:
         yield
 

@@ -519,6 +519,25 @@ async def main_with_loop(loop: asyncio.AbstractEventLoop) -> None:
             print("Unknown auth command. Use 'openhands auth --help' for available options.")
             return
 
+    # Handle github-copilot-init command
+    if hasattr(args, 'command') and args.command == 'github-copilot-init':
+        from openhands.cli.github_copilot_init import github_copilot_init
+        # Create a mock context for the click command
+        import click
+        ctx = click.Context(github_copilot_init)
+        ctx.params = {
+            'mode': getattr(args, 'mode', 'auto'),
+            'file_store_path': getattr(args, 'file_store_path', None),
+            'config_file': getattr(args, 'config_file', 'config.toml'),
+            'force': getattr(args, 'force', False),
+            'dry_run': getattr(args, 'dry_run', False),
+        }
+        try:
+            github_copilot_init.invoke(ctx)
+        except SystemExit:
+            pass
+        return
+
     # Set log level from command line argument if provided
     if args.log_level and isinstance(args.log_level, str):
         log_level = getattr(logging, str(args.log_level).upper())
@@ -532,6 +551,13 @@ async def main_with_loop(loop: asyncio.AbstractEventLoop) -> None:
 
     # Load config from toml and override with command line arguments
     config: OpenHandsConfig = setup_config_from_args(args)
+
+    # Auto-setup GitHub Copilot settings if configured
+    try:
+        from openhands.cli.github_copilot_setup import setup_github_copilot_settings_sync
+        setup_github_copilot_settings_sync(config.file_store_path, config_file=args.config_file)
+    except Exception as e:
+        logger.warning(f"Failed to auto-setup GitHub Copilot settings: {e}")
 
     # Attempt to install VS Code extension if applicable (one-time attempt)
     attempt_vscode_extension_install()

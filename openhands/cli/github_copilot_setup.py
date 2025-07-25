@@ -20,14 +20,17 @@ from openhands.storage.settings.file_settings_store import FileSettingsStore
 from openhands.storage import get_file_store
 
 
-def detect_github_copilot_config() -> Optional[dict]:
+def detect_github_copilot_config(config_file: str = 'config.toml') -> Optional[dict]:
     """Detect GitHub Copilot configuration from config files and environment.
+    
+    Args:
+        config_file: Path to the config file (default: config.toml)
     
     Returns:
         Dictionary with GitHub Copilot settings if detected, None otherwise.
     """
     try:
-        config = load_openhands_config()
+        config = load_openhands_config(config_file=config_file)
         llm_config = config.get_llm_config()
         
         # Check if this is a GitHub Copilot configuration
@@ -123,25 +126,26 @@ def create_github_copilot_settings(copilot_config: dict, mode: str = "direct") -
     return settings
 
 
-async def setup_github_copilot_settings(file_store_path: Optional[str] = None, mode: str = "direct") -> bool:
+async def setup_github_copilot_settings(file_store_path: Optional[str] = None, mode: str = "direct", config_file: str = 'config.toml') -> bool:
     """Set up GitHub Copilot settings.json file.
     
     Args:
         file_store_path: Path to file store directory. If None, uses default from config.
         mode: Either "direct" or "proxy" mode
+        config_file: Path to the config file (default: config.toml)
         
     Returns:
         True if settings were created/updated, False otherwise
     """
     try:
         # Detect GitHub Copilot configuration
-        copilot_config = detect_github_copilot_config()
+        copilot_config = detect_github_copilot_config(config_file)
         if not copilot_config:
             logger.info("No GitHub Copilot configuration detected")
             return False
         
         # Load OpenHands config to get file store path
-        config = load_openhands_config()
+        config = load_openhands_config(config_file=config_file)
         if file_store_path is None:
             file_store_path = config.file_store_path
         
@@ -187,7 +191,7 @@ async def setup_github_copilot_settings(file_store_path: Optional[str] = None, m
         return False
 
 
-def setup_github_copilot_settings_sync(file_store_path: Optional[str] = None, mode: str = "direct") -> bool:
+def setup_github_copilot_settings_sync(file_store_path: Optional[str] = None, mode: str = "direct", config_file: str = 'config.toml') -> bool:
     """Synchronous wrapper for setup_github_copilot_settings."""
     import asyncio
     
@@ -196,25 +200,28 @@ def setup_github_copilot_settings_sync(file_store_path: Optional[str] = None, mo
         loop = asyncio.get_event_loop()
         if loop.is_running():
             # If loop is running, create a new task
-            task = asyncio.create_task(setup_github_copilot_settings(file_store_path, mode))
+            task = asyncio.create_task(setup_github_copilot_settings(file_store_path, mode, config_file))
             # We can't await in a running loop, so we return False and log a warning
             logger.warning("Event loop is running, cannot setup GitHub Copilot settings synchronously")
             return False
         else:
-            return loop.run_until_complete(setup_github_copilot_settings(file_store_path, mode))
+            return loop.run_until_complete(setup_github_copilot_settings(file_store_path, mode, config_file))
     except RuntimeError:
         # No event loop, create a new one
-        return asyncio.run(setup_github_copilot_settings(file_store_path, mode))
+        return asyncio.run(setup_github_copilot_settings(file_store_path, mode, config_file))
 
 
-def detect_github_copilot_mode() -> Optional[str]:
+def detect_github_copilot_mode(config_file: str = 'config.toml') -> Optional[str]:
     """Detect GitHub Copilot mode from configuration.
+    
+    Args:
+        config_file: Path to the config file (default: config.toml)
     
     Returns:
         "direct", "proxy", or None if not GitHub Copilot
     """
     try:
-        config = load_openhands_config()
+        config = load_openhands_config(config_file=config_file)
         llm_config = config.get_llm_config()
         
         if not GitHubCopilotConfig.is_github_copilot_model(llm_config.model):

@@ -766,7 +766,7 @@ def get_parser() -> argparse.ArgumentParser:
         default=None,
     )
     
-    # Add auth subcommand
+    # Add subcommands
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
     
     # Auth command
@@ -780,6 +780,16 @@ def get_parser() -> argparse.ArgumentParser:
     github_copilot_parser.add_argument('--check-only', action='store_true', help='Only check authentication status')
     github_copilot_parser.add_argument('--revoke', action='store_true', help='Revoke authentication')
     github_copilot_parser.add_argument('--status', action='store_true', help='Show detailed status')
+    
+    # GitHub Copilot init command
+    init_parser = subparsers.add_parser('github-copilot-init', help='Initialize GitHub Copilot settings')
+    init_parser.add_argument('--mode', choices=['direct', 'proxy', 'auto'], default='auto', 
+                           help='GitHub Copilot mode: direct, proxy, or auto-detect')
+    init_parser.add_argument('--file-store-path', type=str, help='Custom file store path')
+    init_parser.add_argument('--config-file', type=str, default='config.toml',
+                           help='Custom config.toml file path (default: config.toml)')
+    init_parser.add_argument('--force', action='store_true', help='Force overwrite existing settings.json')
+    init_parser.add_argument('--dry-run', action='store_true', help='Show what would be done without making changes')
     
     return parser
 
