@@ -43,35 +43,41 @@ def detect_github_copilot_config(config_file: str = 'config.toml') -> Optional[d
             
         logger.info(f"Detected GitHub Copilot configuration: {llm_config.model}")
         
-        # Determine API key source
+        # Determine mode and API key source based on configuration
+        mode = "proxy" if is_github_copilot_proxy else "direct"
         api_key = None
         api_key_source = "none"
         
-        # Check OAuth authentication first
-        try:
-            if is_authenticated():
-                auth_manager = get_auth_manager()
-                oauth_key = auth_manager.get_api_key()
-                if oauth_key:
-                    api_key = oauth_key
-                    api_key_source = "oauth"
-                    logger.debug("Using OAuth token for GitHub Copilot")
-        except Exception as e:
-            logger.debug(f"OAuth authentication check failed: {e}")
-        
-        # Check environment variable
-        if not api_key:
-            github_token = os.getenv("GITHUB_TOKEN")
-            if github_token:
-                api_key = github_token
-                api_key_source = "environment"
-                logger.debug("Using GITHUB_TOKEN environment variable")
-        
-        # Check config file API key
-        if not api_key and llm_config.api_key:
-            api_key = llm_config.api_key.get_secret_value()
-            api_key_source = "config"
-            logger.debug("Using API key from config file")
+        if mode == "direct":
+            # For direct mode: use OAuth authentication
+            try:
+                if is_authenticated():
+                    auth_manager = get_auth_manager()
+                    oauth_key = auth_manager.get_api_key()
+                    if oauth_key:
+                        api_key = oauth_key
+                        api_key_source = "oauth"
+                        logger.debug("Using OAuth token for direct GitHub Copilot mode")
+                else:
+                    logger.warning("Direct GitHub Copilot mode requires OAuth authentication")
+            except Exception as e:
+                logger.debug(f"OAuth authentication check failed: {e}")
+                
+            # Fallback to environment variable for direct mode
+            if not api_key:
+                github_token = os.getenv("GITHUB_TOKEN")
+                if github_token:
+                    api_key = github_token
+                    api_key_source = "environment"
+                    logger.debug("Using GITHUB_TOKEN environment variable for direct mode")
+        else:
+            # For proxy mode: use API key from config file as-is
+            if llm_config.api_key:
+                api_key = llm_config.api_key.get_secret_value()
+                api_key_source = "config"
+                logger.debug("Using API key from config file for proxy mode")
+            else:
+                logger.warning("Proxy GitHub Copilot mode requires API key in config file")
         
         if not api_key:
             logger.warning("No GitHub Copilot API key found")
