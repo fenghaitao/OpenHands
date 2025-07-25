@@ -32,7 +32,8 @@ openhands auth github-copilot --status
 
 3. **Start OpenHands** - settings will be auto-configured:
    ```bash
-   openhands
+   openhands --config-file ./config_github_copilot_llm_direct.toml
+
    ```
 
 ## How It Works
