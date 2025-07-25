@@ -4,6 +4,20 @@ This feature automatically configures GitHub Copilot settings to avoid UI prompt
 
 ## Quick Start
 
+### ⚠️ Authentication Required First
+
+**Before any setup**, you **must** authenticate with GitHub Copilot:
+
+```bash
+# Step 1: Authenticate (required before any setup)
+openhands auth github-copilot
+
+# Step 2: Verify authentication
+openhands auth github-copilot --status
+```
+
+### Configuration Steps
+
 1. **Configure GitHub Copilot** in your `config.toml`:
    ```toml
    [llm]
@@ -11,12 +25,7 @@ This feature automatically configures GitHub Copilot settings to avoid UI prompt
    custom_llm_provider = "github_copilot"
    ```
 
-2. **Authenticate** with GitHub Copilot:
-   ```bash
-   openhands auth github-copilot
-   ```
-
-3. **Start OpenHands** - settings will be auto-configured:
+2. **Start OpenHands** - settings will be auto-configured:
    ```bash
    openhands
    ```

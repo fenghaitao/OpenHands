@@ -256,19 +256,26 @@ file_store = "local"
 
 #################################### Usage Instructions ######################
 #
-# 1. Authenticate with GitHub Copilot:
+# 🔴 CRITICAL: Authentication Required First 🔴
+#
+# You MUST authenticate with GitHub Copilot before using this configuration.
+# Without authentication, you'll see "No GitHub Copilot API key found" errors.
+#
+# 1. Authenticate with GitHub Copilot (REQUIRED):
 #    openhands auth github-copilot
 #
-# 2. Start OpenHands with this configuration:
-#    openhands --config-file config_github_copilot.toml
-#
-# 3. Or use a specific model:
-#    openhands --config-file config_github_copilot.toml --model github_copilot/gpt-4.1
-#
-# 4. Check authentication status:
+# 2. Verify authentication worked:
 #    openhands auth github-copilot --status
 #
-# 5. Validate the setup:
-#    python validate_github_copilot.py
+# 3. Start OpenHands with this configuration:
+#    openhands --config-file config_github_copilot_llm_direct.toml
+#
+# 4. Or use a specific model:
+#    openhands --config-file config_github_copilot_llm_direct.toml --model github_copilot/gpt-4.1
+#
+# 5. If you get authentication errors:
+#    - Run step 1 again
+#    - Check your GitHub account has Copilot access
+#    - Try: export GITHUB_TOKEN="your_token_here"
 #
 ##############################################################################

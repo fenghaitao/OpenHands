@@ -23,13 +23,21 @@ This implementation adds comprehensive GitHub Copilot support to OpenHands throu
 
 ## Quick Start
 
-### 1. Set up authentication
+### ⚠️ IMPORTANT: Authentication Required First
+
+Before using GitHub Copilot with OpenHands, you **must** authenticate:
 
 ```bash
-export GITHUB_TOKEN="your_github_token_here"
+# Step 1: Authenticate with GitHub Copilot (OAuth recommended)
+openhands auth github-copilot
+
+# Step 2: Verify authentication status
+openhands auth github-copilot --status
 ```
 
 ### 2. Configure OpenHands
+
+Create or update your `config.toml`:
 
 ```toml
 [llm]
@@ -40,7 +48,15 @@ custom_llm_provider = "github_copilot"
 ### 3. Use with CLI
 
 ```bash
-openhands --model github_copilot/gpt-4.1
+openhands --config-file config.toml
+```
+
+### Alternative: Environment Variable Authentication
+
+Instead of OAuth, you can use a GitHub token:
+
+```bash
+export GITHUB_TOKEN="your_github_token_here"
 ```
 
 ### 4. Use with Python API
