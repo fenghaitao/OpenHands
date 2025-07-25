@@ -267,13 +267,16 @@ file_store = "local"
 # 2. Verify authentication worked:
 #    openhands auth github-copilot --status
 #
-# 3. Start OpenHands with this configuration:
+# 3. Run the setup command with this config file:
+#    openhands github-copilot-init --config-file ./config_github_copilot_llm_direct.toml
+#
+# 4. Start OpenHands:
 #    openhands --config-file config_github_copilot_llm_direct.toml
 #
-# 4. Or use a specific model:
+# 5. Or use a specific model:
 #    openhands --config-file config_github_copilot_llm_direct.toml --model github_copilot/gpt-4.1
 #
-# 5. If you get authentication errors:
+# 6. If you get authentication errors:
 #    - Run step 1 again
 #    - Check your GitHub account has Copilot access
 #    - Try: export GITHUB_TOKEN="your_token_here"
