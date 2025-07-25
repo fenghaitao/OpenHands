@@ -34,11 +34,11 @@ def detect_github_copilot_config(config_file: str = 'config.toml') -> Optional[d
         llm_config = config.get_llm_config()
         
         # Check if this is a GitHub Copilot configuration
-        if not GitHubCopilotConfig.is_github_copilot_model(llm_config.model):
-            return None
-            
-        # Check if custom_llm_provider is set to github_copilot
-        if llm_config.custom_llm_provider != "github_copilot":
+        # Support both direct github_copilot models and proxy mode
+        is_github_copilot_proxy = llm_config.model and llm_config.model.startswith('litellm_proxy/github_copilot/')
+        is_github_copilot_direct = llm_config.custom_llm_provider == "github_copilot"
+        
+        if not (is_github_copilot_proxy or is_github_copilot_direct):
             return None
             
         logger.info(f"Detected GitHub Copilot configuration: {llm_config.model}")
@@ -102,12 +102,8 @@ def create_github_copilot_settings(copilot_config: dict, mode: str = "direct") -
     Returns:
         Settings object configured for GitHub Copilot
     """
-    # Adjust model name based on mode
+    # Use original model name from config without modification
     model = copilot_config["model"]
-    if mode == "proxy" and not model.startswith("litellm_proxy/"):
-        model = f"litellm_proxy/{model}"
-    elif mode == "direct" and model.startswith("litellm_proxy/"):
-        model = model.replace("litellm_proxy/", "")
     
     settings = Settings(
         language="en",
@@ -227,9 +223,8 @@ def detect_github_copilot_mode(config_file: str = 'config.toml') -> Optional[str
         if not GitHubCopilotConfig.is_github_copilot_model(llm_config.model):
             return None
             
-        # Check if using proxy mode based on model name or base URL
-        if (llm_config.model.startswith("litellm_proxy/") or 
-            (llm_config.base_url and "localhost" in llm_config.base_url)):
+        # Check if using proxy mode based on model name
+        if llm_config.model.startswith("litellm_proxy/github_copilot/"):
             return "proxy"
         else:
             return "direct"
