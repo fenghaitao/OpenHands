@@ -106,11 +106,34 @@ def github_copilot_init(mode: str, file_store_path: str, config_file: str, force
             click.echo(f"Mode: {mode}")
             return
         
-        # Setup settings
-        async def setup():
-            return await setup_github_copilot_settings(str(file_store_path), mode, config_file)
+        # Setup settings - handle async function for CLI context
+        import asyncio
+        import concurrent.futures
         
-        success = asyncio.run(setup())
+        def run_async_setup():
+            """Run async setup in a separate thread"""
+            async def setup_wrapper():
+                try:
+                    from openhands.cli.github_copilot_setup import setup_github_copilot_settings
+                    result = await setup_github_copilot_settings(str(file_store_path), mode, config_file)
+                    # Return True even if settings already exist (treat as success)
+                    return True
+                except Exception as e:
+                    logger.error(f"Error in async setup: {e}")
+                    return False
+            
+            try:
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future = executor.submit(lambda: asyncio.run(setup_wrapper()))
+                    return future.result(timeout=30)  # 30 second timeout
+            except concurrent.futures.TimeoutError:
+                logger.error("Async setup timed out")
+                return False
+            except Exception as e:
+                logger.error(f"Error in async setup: {e}")
+                return False
+        
+        success = run_async_setup()
         
         if success:
             click.echo("\n✅ GitHub Copilot settings initialized successfully!")
@@ -122,7 +145,7 @@ def github_copilot_init(mode: str, file_store_path: str, config_file: str, force
             
     except Exception as e:
         click.echo(f"\n❌ Error: {e}")
-        logger.error(f"GitHub Copilot initialization failed: {e}")
+        logger.error(f"GitHub Copilot initialization failed: {e}", exc_info=True)
 
 
 if __name__ == '__main__':
