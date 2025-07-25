@@ -1,0 +1,157 @@
+---
+title: GitHub Copilot Auto-Setup
+description: Automatically configure GitHub Copilot settings to skip UI prompts
+---
+
+# GitHub Copilot Auto-Setup
+
+OpenHands can automatically detect and configure GitHub Copilot settings to avoid UI prompts for provider setup. This feature works for both direct and proxy modes.
+
+## How It Works
+
+When OpenHands starts (either CLI or web UI), it automatically:
+
+1. **Detects GitHub Copilot configuration** from your `config.toml` file
+2. **Determines the mode** (direct or proxy) based on your configuration
+3. **Creates `settings.json`** with appropriate GitHub Copilot settings
+4. **Skips provider setup prompts** in the UI
+
+## Automatic Detection
+
+The auto-setup feature activates when:
+
+- ✅ Your `config.toml` has `custom_llm_provider = "github_copilot"`
+- ✅ Your model starts with `github_copilot/` (e.g., `github_copilot/gpt-4.1`)
+- ✅ You have valid authentication (OAuth or `GITHUB_TOKEN`)
+- ✅ No existing `settings.json` file exists
+
+## Configuration Examples
+
+### Direct Mode Configuration
+
+```toml
+[llm]
+model = "github_copilot/gpt-4.1"
+custom_llm_provider = "github_copilot"
+# API key will be auto-detected from OAuth or GITHUB_TOKEN
+```
+
+### Proxy Mode Configuration
+
+```toml
+[core]
+file_store_path = "~/.openhands/llm_proxy"
+
+[llm]
+model = "litellm_proxy/github_copilot/gpt-4.1"
+base_url = "http://localhost:4000"
+custom_llm_provider = "github_copilot"
+```
+
+## Manual Setup Command
+
+You can also manually trigger the setup using the CLI command:
+
+```bash
+# Auto-detect mode and setup
+openhands github-copilot-init
+
+# Specify mode explicitly
+openhands github-copilot-init --mode direct
+openhands github-copilot-init --mode proxy
+
+# Custom file store path
+openhands github-copilot-init --file-store-path ~/.openhands/custom
+
+# Force overwrite existing settings
+openhands github-copilot-init --force
+
+# Dry run to see what would be done
+openhands github-copilot-init --dry-run
+```
+
+## Generated Settings
+
+The auto-setup creates a `settings.json` file with:
+
+```json
+{
+  "language": "en",
+  "agent": "CodeActAgent",
+  "max_iterations": 100,
+  "confirmation_mode": true,
+  "llm_model": "github_copilot/gpt-4.1",
+  "llm_api_key": "your-api-key",
+  "llm_base_url": "https://api.githubcopilot.com",
+  "enable_default_condenser": true,
+  "enable_sound_notifications": false,
+  "enable_proactive_conversation_starters": true
+}
+```
+
+## Modes Explained
+
+### Direct Mode
+- Uses GitHub Copilot API directly
+- Model: `github_copilot/gpt-4.1`
+- Base URL: `https://api.githubcopilot.com`
+
+### Proxy Mode  
+- Uses LiteLLM proxy server
+- Model: `litellm_proxy/github_copilot/gpt-4.1`
+- Base URL: `http://localhost:4000` (or your proxy URL)
+
+## Authentication Sources
+
+The auto-setup checks for authentication in this order:
+
+1. **OAuth Token** - From `openhands auth github-copilot`
+2. **Environment Variable** - `GITHUB_TOKEN`
+3. **Config File** - `api_key` in your `config.toml`
+
+## Troubleshooting
+
+### No Auto-Setup Occurring
+
+Check that you have:
+- `custom_llm_provider = "github_copilot"` in your config
+- A valid GitHub Copilot model name
+- Valid authentication
+- No existing `settings.json` file
+
+### Settings Not Applied
+
+If the UI still prompts for provider setup:
+- Check the `settings.json` file exists in your file store path
+- Verify the file contains valid JSON
+- Restart OpenHands to reload settings
+
+### Manual Verification
+
+You can verify your setup with:
+
+```bash
+# Check authentication
+openhands auth github-copilot --status
+
+# Validate configuration
+python validate_github_copilot.py
+
+# Test the setup command
+openhands github-copilot-init --dry-run
+```
+
+## File Locations
+
+Default file store paths:
+- **Direct mode**: `~/.openhands/settings.json`
+- **Proxy mode**: `~/.openhands/llm_proxy/settings.json`
+
+You can customize the path with `file_store_path` in your config.
+
+## Benefits
+
+- 🚀 **Faster startup** - No manual provider configuration needed
+- 🔄 **Consistent setup** - Same settings across CLI and web UI
+- 🛡️ **Secure** - Uses existing authentication methods
+- 🎯 **Mode-aware** - Automatically detects direct vs proxy mode
