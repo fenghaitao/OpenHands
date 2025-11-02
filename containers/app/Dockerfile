@@ -1,5 +1,5 @@
 ARG OPENHANDS_BUILD_VERSION=dev
-FROM node:24.8-trixie-slim AS frontend-builder
+FROM node:24-slim AS frontend-builder
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ RUN npm ci
 COPY frontend ./
 RUN npm run build
 
-FROM python:3.13.7-slim-trixie AS base
+FROM python:3.13-slim AS base
 FROM base AS backend-builder
 
 WORKDIR /app
