@@ -4,10 +4,7 @@ services:
     build:
       context: ./
       dockerfile: ./containers/app/Dockerfile
-      args:
-        - http_proxy=${http_proxy}
-        - https_proxy=${https_proxy}
-        - no_proxy=${no_proxy}
+      network: host
     image: openhands:latest
     container_name: openhands-app-${DATE:-}
     environment:

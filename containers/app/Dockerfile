@@ -20,13 +20,17 @@ ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_CREATE=1 \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
-RUN apt-get update -y \
-    && apt-get install -y curl make git build-essential jq gettext \
+RUN apt-get -o Acquire::http::proxy=false update -y \
+    && apt-get -o Acquire::http::proxy=false install -y curl make git build-essential jq gettext \
     && python3 -m pip install poetry --break-system-packages
 
 COPY pyproject.toml poetry.lock ./
 RUN touch README.md
-RUN export POETRY_CACHE_DIR && poetry install --no-root && rm -rf $POETRY_CACHE_DIR
+RUN export POETRY_CACHE_DIR && \
+    pip config set global.timeout 300 && \
+    poetry config installer.max-workers 10 && \
+    poetry install --no-root && \
+    rm -rf $POETRY_CACHE_DIR
 
 FROM base AS openhands-app
 
@@ -49,8 +53,8 @@ ENV INIT_GIT_IN_EMPTY_WORKSPACE=1
 RUN mkdir -p $FILE_STORE_PATH
 RUN mkdir -p $WORKSPACE_BASE
 
-RUN apt-get update -y \
-    && apt-get install -y curl ssh sudo \
+RUN apt-get -o Acquire::http::proxy=false update -y \
+    && apt-get -o Acquire::http::proxy=false install -y curl ssh sudo \
     && rm -rf /var/lib/apt/lists/*
 
 # Default is 1000, but OSX is often 501
