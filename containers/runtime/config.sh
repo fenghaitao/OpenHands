@@ -4,3 +4,6 @@ DOCKER_IMAGE_SOURCE_TAG=oh_v0.59.0_if48c2wny33soysh_w8u9ct7lxv15vcdg
 
 DOCKER_IMAGE_TAG=oh_v0.59.0_image_nikolaik_s_python-nodejs_tag_python3.12-nodejs22
 DOCKER_IMAGE_SOURCE_TAG=oh_v0.59.0_if48c2wny33soysh_w8u9ct7lxv15vcdg
+
+DOCKER_IMAGE_TAG=oh_v0.59.0_image_nikolaik_s_python-nodejs_tag_python3.12-nodejs22
+DOCKER_IMAGE_SOURCE_TAG=oh_v0.59.0_if48c2wny33soysh_f598sn44x8cjrvi0
