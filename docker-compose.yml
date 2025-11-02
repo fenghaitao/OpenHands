@@ -9,12 +9,13 @@ services:
     container_name: openhands-app-${DATE:-}
     environment:
       - SANDBOX_RUNTIME_CONTAINER_IMAGE=${SANDBOX_RUNTIME_CONTAINER_IMAGE:-docker.all-hands.dev/all-hands-ai/runtime:0.59-nikolaik}
-      #- SANDBOX_USER_ID=${SANDBOX_USER_ID:-1234} # enable this only if you want a specific non-root sandbox user but you will have to manually adjust permissions of ~/.openhands for this user
+      - SANDBOX_LOCAL_RUNTIME_URL=http://localhost
       - WORKSPACE_MOUNT_PATH=${WORKSPACE_BASE:-$PWD/workspace}
-    ports:
-      - "3000:3000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - HTTP_PROXY=${http_proxy:-}
+      - HTTPS_PROXY=${https_proxy:-}
+      - NO_PROXY=localhost,127.0.0.1,192.168.0.0/16,172.16.0.0/12,10.0.0.0/8
+      - SANDBOX_RUNTIME_STARTUP_ENV_VARS={'HTTP_PROXY':'${http_proxy:-}','HTTPS_PROXY':'${https_proxy:-}','NO_PROXY':'localhost,127.0.0.1,192.168.0.0/16,172.16.0.0/12,10.0.0.0/8'}
+    network_mode: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.openhands:/.openhands
