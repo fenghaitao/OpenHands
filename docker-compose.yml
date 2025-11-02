@@ -14,6 +14,13 @@ services:
       - SANDBOX_RUNTIME_CONTAINER_IMAGE=${SANDBOX_RUNTIME_CONTAINER_IMAGE:-docker.all-hands.dev/all-hands-ai/runtime:0.59-nikolaik}
       #- SANDBOX_USER_ID=${SANDBOX_USER_ID:-1234} # enable this only if you want a specific non-root sandbox user but you will have to manually adjust permissions of ~/.openhands for this user
       - WORKSPACE_MOUNT_PATH=${WORKSPACE_BASE:-$PWD/workspace}
+      - http_proxy=${http_proxy:-}
+      - https_proxy=${https_proxy:-}
+      - no_proxy=${no_proxy:-localhost,127.0.0.1}
+      - HTTP_PROXY=${http_proxy:-}
+      - HTTPS_PROXY=${https_proxy:-}
+      - NO_PROXY=${no_proxy:-localhost,127.0.0.1}
+      - SANDBOX_RUNTIME_STARTUP_ENV_VARS={'HTTP_PROXY':'${http_proxy:-}','HTTPS_PROXY':'${https_proxy:-}','NO_PROXY':'${no_proxy:-localhost,127.0.0.1}'}
     ports:
       - "3000:3000"
     extra_hosts:
@@ -22,6 +29,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.openhands:/.openhands
       - ${WORKSPACE_BASE:-./workspace}:/opt/workspace_base
+      - ./proxy-patch.py:/app/.venv/lib/python3.13/site-packages/sitecustomize.py:ro
     pull_policy: build
     stdin_open: true
     tty: true
