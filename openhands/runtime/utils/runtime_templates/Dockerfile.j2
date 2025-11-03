@@ -4,8 +4,8 @@ SHELL ["/bin/bash", "-c"]
 
 # Shared environment variables
 ENV POETRY_VIRTUALENVS_PATH=/openhands/poetry \
-    POETRY_HTTP_TIMEOUT=300 \
-    UV_HTTP_TIMEOUT=300 \
+    POETRY_HTTP_TIMEOUT=600 \
+    UV_HTTP_TIMEOUT=600 \
     MAMBA_ROOT_PREFIX=/openhands/micromamba \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
@@ -369,14 +369,3 @@ RUN \
     echo 'eval "$(/openhands/micromamba/bin/micromamba shell hook --shell bash)"' >> /home/openhands/.bashrc && \
     echo 'micromamba activate openhands 2>/dev/null || true' >> /home/openhands/.bashrc && \
     chown openhands:openhands /home/openhands/.bashrc
-
-# Pre-install mcp-server-fetch to avoid runtime installation failures
-USER openhands
-RUN \
-    # Pre-install mcp-server-fetch with extended timeout
-    # This prevents runtime installation failures due to timeout
-    /openhands/micromamba/bin/micromamba run -n openhands \
-    uv tool install mcp-server-fetch && \
-    echo "mcp-server-fetch pre-installed successfully"
-
-USER root

@@ -60,11 +60,8 @@ class MCPProxyManager:
             return None
 
         # Create a new proxy with the current configuration
-        self.proxy = FastMCP.as_proxy(
-            self.config,
-            auth_enabled=self.auth_enabled,
-            api_key=self.api_key,
-        )
+        # Note: FastMCP 2.12+ doesn't accept api_key and auth_enabled in as_proxy()
+        self.proxy = FastMCP.as_proxy(self.config)
 
         logger.info('FastMCP Proxy initialized successfully')
 
