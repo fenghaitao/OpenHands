@@ -36,6 +36,12 @@ def main() -> None:
             from openhands_cli.gui_launcher import launch_gui_server
 
             launch_gui_server(mount_cwd=args.mount_cwd, gpu=args.gpu)
+        elif args.command == 'spec':
+            # Import spec commands only when needed
+            from openhands_cli.spec import handle_spec_command
+
+            # Handle spec-driven development commands
+            handle_spec_command(args)
         else:
             # Default CLI behavior - no subcommand needed
             # Import agent_chat only when needed

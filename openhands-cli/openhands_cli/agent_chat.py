@@ -6,6 +6,7 @@ Provides a conversation interface with an AI agent using OpenHands patterns.
 
 import sys
 from datetime import datetime
+from pathlib import Path
 
 from openhands.sdk import (
     Message,
@@ -26,6 +27,13 @@ from openhands_cli.tui.tui import (
 )
 from openhands_cli.user_actions import UserConfirmation, exit_session_confirmation
 from openhands_cli.user_actions.utils import get_session_prompter
+
+# Import SDD context integration
+try:
+    from openhands_cli.spec.agent_integration import OpenHandsContextProvider
+    SDD_AVAILABLE = True
+except ImportError:
+    SDD_AVAILABLE = False
 
 
 def _restore_tty() -> None:
@@ -58,12 +66,20 @@ def _print_exit_hint(conversation_id: str) -> None:
 def run_cli_entry(resume_conversation_id: str | None = None) -> None:
     """Run the agent chat session using the agent SDK.
 
-
     Raises:
         AgentSetupError: If agent setup fails
         KeyboardInterrupt: If user interrupts the session
         EOFError: If EOF is encountered
     """
+    
+    # Initialize SDD context provider
+    sdd_context = None
+    if SDD_AVAILABLE:
+        try:
+            sdd_context = OpenHandsContextProvider(Path.cwd())
+        except Exception:
+            # If SDD context fails, continue without it
+            sdd_context = None
 
     try:
         conversation = start_fresh_conversation(resume_conversation_id)
@@ -72,8 +88,32 @@ def run_cli_entry(resume_conversation_id: str | None = None) -> None:
         print_formatted_text(HTML('\n<yellow>Goodbye! 👋</yellow>'))
         return
 
-
     display_welcome(conversation.id, bool(resume_conversation_id))
+    
+    # Display SDD context if available
+    if sdd_context and sdd_context.should_inject_context():
+        print_formatted_text(HTML('<cyan>'))
+        print_formatted_text(sdd_context.get_context_banner())
+        print_formatted_text(HTML('</cyan>'))
+        print()
+        
+        # Inject initial context message into conversation
+        if not resume_conversation_id:  # Only for new conversations
+            try:
+                initial_context = sdd_context.get_initial_context_message()
+                if initial_context:
+                    context_message = Message(
+                        role='user',
+                        content=[TextContent(text=initial_context)],
+                    )
+                    # Send context to agent but don't wait for response
+                    runner_temp = ConversationRunner(conversation)
+                    runner_temp.process_message(context_message, wait_for_response=False)
+                    print_formatted_text(HTML('<dim>✓ SDD context loaded into conversation</dim>'))
+                    print()
+            except Exception as e:
+                print_formatted_text(HTML(f'<yellow>Warning: Could not inject SDD context: {e}</yellow>'))
+                print()
 
     # Track session start time for uptime calculation
     session_start_time = datetime.now()
@@ -97,9 +137,17 @@ def run_cli_entry(resume_conversation_id: str | None = None) -> None:
             # Handle commands
             command = user_input.strip().lower()
 
+            # Enhance user message with SDD context if available
+            enhanced_input = user_input
+            if sdd_context and sdd_context.should_inject_context():
+                # Add compact context to user messages for agent awareness
+                compact_context = sdd_context.get_compact_context()
+                if compact_context:
+                    enhanced_input = f"{compact_context}\n**User Request**: {user_input}"
+            
             message = Message(
                 role='user',
-                content=[TextContent(text=user_input)],
+                content=[TextContent(text=enhanced_input)],
             )
 
             if command == '/exit':
@@ -141,6 +189,11 @@ def run_cli_entry(resume_conversation_id: str | None = None) -> None:
 
             elif command == '/help':
                 display_help()
+                # Add SDD-specific help if available
+                if sdd_context and sdd_context.should_inject_context():
+                    print_formatted_text(HTML('\n<cyan>Specification-Driven Development Commands:</cyan>'))
+                    print_formatted_text(HTML('  <gold>/sdd</gold> or <gold>/context</gold> - Show current SDD context'))
+                    print_formatted_text(HTML('  <gold>/progress</gold> - Show project progress and next actions'))
                 continue
 
             elif command == '/status':
@@ -155,6 +208,37 @@ def run_cli_entry(resume_conversation_id: str | None = None) -> None:
                 print_formatted_text(
                     HTML(f'<yellow>Confirmation mode {new_status}</yellow>')
                 )
+                continue
+            
+            # SDD-specific commands
+            elif command == '/sdd' or command == '/context':
+                if sdd_context and sdd_context.should_inject_context():
+                    compact_context = sdd_context.get_compact_context()
+                    if compact_context:
+                        print_formatted_text(HTML('<cyan>'))
+                        print_formatted_text(compact_context)
+                        print_formatted_text(HTML('</cyan>'))
+                    else:
+                        print_formatted_text(HTML('<yellow>No SDD context available</yellow>'))
+                else:
+                    print_formatted_text(HTML('<yellow>This is not a Specification-Driven Development project</yellow>'))
+                continue
+            
+            elif command == '/progress':
+                if sdd_context and sdd_context.should_inject_context():
+                    progress = sdd_context.get_progress_summary()
+                    print_formatted_text(HTML('<cyan>'))
+                    print_formatted_text(progress)
+                    print_formatted_text(HTML('</cyan>'))
+                    
+                    # Show suggested next actions
+                    suggestions = sdd_context.suggest_next_actions()
+                    if suggestions:
+                        print_formatted_text(HTML('\n<yellow>Suggested next actions:</yellow>'))
+                        for suggestion in suggestions[:3]:
+                            print_formatted_text(HTML(f'  • {suggestion}'))
+                else:
+                    print_formatted_text(HTML('<yellow>This is not a Specification-Driven Development project</yellow>'))
                 continue
 
             elif command == '/resume':

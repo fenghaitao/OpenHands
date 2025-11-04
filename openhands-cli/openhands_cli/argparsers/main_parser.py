@@ -1,6 +1,7 @@
 """Main argument parser for OpenHands CLI."""
 
 import argparse
+from .spec_parser import add_spec_subcommands
 
 
 def create_main_parser() -> argparse.ArgumentParser:
@@ -15,12 +16,16 @@ def create_main_parser() -> argparse.ArgumentParser:
         epilog="""
 By default, OpenHands runs in CLI mode (terminal interface).
 Use 'serve' subcommand to launch the GUI server instead.
+Use 'spec' subcommands for Specification-Driven Development workflow.
 
 Examples:
   openhands                           # Start CLI mode
   openhands --resume conversation-id  # Resume a conversation in CLI mode
   openhands serve                     # Launch GUI server
   openhands serve --gpu               # Launch GUI server with GPU support
+  openhands spec init myproject       # Initialize spec-driven project
+  openhands spec constitution         # Establish project principles
+  openhands spec specify              # Create baseline specification
 """
     )
     
@@ -52,5 +57,8 @@ Examples:
         action='store_true',
         help='Enable GPU support in the Docker container'
     )
+    
+    # Add spec subcommands
+    add_spec_subcommands(subparsers)
     
     return parser
